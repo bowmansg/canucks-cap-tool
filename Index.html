@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Canucks Cap Tool</title>
+  <style>
+    :root{
+      --navy:#001f5b; --blue:#0072ce; --green:#00843d; --ice:#f5fbff;
+      --ink:#0f172a; --muted:#64748b; --line:#dbeafe; --danger:#dc2626; --warn:#d97706;
+      --card:#ffffff; --bg:#eef6fb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:16px 14px 12px;box-shadow:0 4px 18px rgba(0,31,91,.22)}
+    .header-row{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;flex-direction:column;gap:2px}.brand h1{font-size:22px;margin:0;font-weight:800;letter-spacing:.2px}.brand div{font-size:13px;opacity:.9}
+    .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 10px;font-size:12px;white-space:nowrap}
+    main{max-width:1180px;margin:0 auto;padding:14px 12px 90px}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:10px 0 12px;position:sticky;top:68px;background:var(--bg);z-index:9}
+    .tab{border:1px solid var(--line);background:#fff;color:var(--navy);font-weight:700;border-radius:999px;padding:10px 13px;white-space:nowrap;cursor:pointer}
+    .tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+    .kpi-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:800}.kpi{font-size:24px;font-weight:900;margin-top:4px;color:var(--navy)}
+    .kpi.green{color:var(--green)}.kpi.red{color:var(--danger)}.kpi.warn{color:var(--warn)}
+    .section-title{font-size:18px;font-weight:900;margin:18px 2px 10px;color:var(--navy)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px;background:#fff;font-size:16px}textarea{min-height:100px}.btn{border:0;border-radius:12px;padding:11px 13px;font-weight:800;background:var(--blue);color:#fff;cursor:pointer}.btn.green{background:var(--green)}.btn.gray{background:#475569}.btn.red{background:var(--danger)}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.light{background:#e0f2fe;color:var(--navy)}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:14px}th{background:#eff6ff;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.05em}tr:last-child td{border-bottom:0}tr{cursor:pointer}tr:hover td{background:#f8fafc}.money{font-weight:800;color:var(--navy)}.tag{display:inline-block;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800;background:#e0f2fe;color:var(--navy)}.tag.green{background:#dcfce7;color:#166534}.tag.warn{background:#fef3c7;color:#92400e}.tag.red{background:#fee2e2;color:#991b1b}.muted{color:var(--muted)}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hidden{display:none!important}.notice{padding:12px;border-radius:14px;margin:10px 0;font-weight:800}.notice.red{background:#fee2e2;color:#991b1b}.notice.warn{background:#fef3c7;color:#92400e}.notice.green{background:#dcfce7;color:#166534}
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:12px}.modal-card{background:#fff;border-radius:22px 22px 18px 18px;width:100%;max-width:720px;max-height:88vh;overflow:auto;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.24)}.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.modal-head h2{margin:0;color:var(--navy)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;margin:10px 0 5px}.asset-list{display:flex;flex-direction:column;gap:8px}.asset-chip{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.asset-chip strong{display:block}.summary-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0}.summary-line:last-child{border-bottom:0}.search-results{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:14px}.search-row{padding:10px;border-bottom:1px solid #e2e8f0;cursor:pointer}.search-row:hover{background:#f8fafc}
+    @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.split{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.brand h1{font-size:19px}.tabs{top:64px}th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}.kpi{font-size:20px}}
+  </style>
+</head>
+<body>
+<header><div class="header-row"><div class="brand"><h1>Canucks Cap Tool</h1><div>Vancouver sim league roster, cap & trade lab</div></div><div class="pill" id="lastUpdated">Loading…</div></div></header>
+<main>
+  <div class="tabs" id="tabs"></div>
+  <section id="view"></section>
+</main>
+<div id="modal" class="hidden"></div>
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbz2OTFddx6itm8ILbc6dPgjyPHlxc-zv9p9o_RcoHLbj1QW2FIMIr5m0dbwr4qlLc3JLg/exec';
+const TABS = ['Dashboard','NHL Roster','Non-Roster','Players','Trade','Expiring','Notes','History'];
+let state = {settings:{}, assets:[], notes:[], history:[], summary:{}, tab:'Dashboard', filter:'All', search:''};
+let trade = {outIds:[], incoming:[], notes:'', changedBy:''};
+
+const $ = id => document.getElementById(id);
+function money(n){ n=Number(n||0); const sign=n<0?'-':''; n=Math.abs(n); if(n>=1000000) return sign+'$'+(n/1000000).toFixed(2).replace(/\.00$/,'')+'M'; if(n>=1000) return sign+'$'+(n/1000).toFixed(0)+'K'; return sign+'$'+n.toLocaleString(); }
+function fullMoney(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:3}); }
+function expiring(a){ return Math.round(Number(a.contractDuration))===1; }
+function displayName(name){ return String(name||'').replace(/,([^ ])/g, ', $1'); }
+function dur(value){ const n=Number(value); if(!isFinite(n)) return value||''; return String(Math.round(n)); }
+function ovr(a){ const n=Number(a.quality); if(!isFinite(n)) return ''; return String(Math.round(n)); }
+function isNHL(a){ return a.rosterStatus==='NHL Roster'; }
+function isNon(a){ return a.rosterStatus==='Non-Roster'; }
+function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+async function load(){
+  if(API_URL.includes('PASTE_')) { renderSetup(); return; }
+  const res = await fetch(API_URL + '?action=getData');
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error||'Load failed');
+  state = {...state, ...data};
+  $('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  render();
+}
+async function post(payload){
+  const body = new URLSearchParams(); body.set('payload', JSON.stringify(payload));
+  const res = await fetch(API_URL, {method:'POST', body});
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error||'Save failed');
+  if(data.data) state = {...state, ...data.data};
+  render();
+}
+function renderSetup(){
+  renderTabs();
+  $('view').innerHTML = `<div class="notice warn">Setup needed: paste your Apps Script Web App URL into <b>API_URL</b> inside index.html after you deploy the Google Apps Script.</div>`;
+}
+function renderTabs(){
+  $('tabs').innerHTML = TABS.map(t=>`<button class="tab ${state.tab===t?'active':''}" onclick="state.tab='${t}';render()">${t}</button>`).join('');
+}
+function render(){ renderTabs(); ({'Dashboard':dashboard,'NHL Roster':roster,'Non-Roster':nonRoster,'Players':players,'Trade':tradeView,'Expiring':expiringView,'Notes':notesView,'History':historyView}[state.tab]||dashboard)(); }
+function dashboard(){
+  const s=state.summary;
+  const rosterWarning=s.nhlRosterCount>Number(s.rosterLimit);
+  $('view').innerHTML = `
+    ${s.overCap?`<div class="notice red">Team is over the salary cap.</div>`:''}
+    ${rosterWarning?`<div class="notice warn">NHL roster is ${s.nhlRosterCount}/${s.rosterLimit}. Roster is over the 23-player limit.</div>`:''}
+    <div class="grid">
+      <div class="card"><div class="kpi-label">Team Cap Hit</div><div class="kpi ${s.overCap?'red':'green'}">${money(s.capHit)}</div><div class="muted">Cap: ${money(s.cap)}</div></div>
+      <div class="card"><div class="kpi-label">Available Cap</div><div class="kpi ${s.availableCap<0?'red':'green'}">${money(s.availableCap)}</div><div class="muted">Hard cap block enabled</div></div>
+      <div class="card"><div class="kpi-label">Expiring Contracts</div><div class="kpi warn">${s.expiringCount}</div><div class="muted">Everyone included</div></div>
+      <div class="card"><div class="kpi-label">NHL Roster</div><div class="kpi ${rosterWarning?'warn':'green'}">${s.nhlRosterCount}/${s.rosterLimit}</div><div class="muted">Only NHL Roster counts</div></div>
+    </div>
+    <div class="section-title">Quick View</div>
+    ${assetTable(state.assets.filter(isNHL).slice().sort(byPosition), true)}
+  `;
+}
+function byPosition(a,b){return String(a.position||'').localeCompare(String(b.position||'')) || String(a.name).localeCompare(String(b.name));}
+function roster(){
+  const list=state.assets.filter(isNHL).slice().sort(byPosition);
+  $('view').innerHTML = `<div class="section-title">NHL Roster</div>${assetTable(list,true)}`;
+}
+function nonRoster(){
+  const list=state.assets.filter(isNon).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  $('view').innerHTML = `<div class="section-title">Non-Roster / AHL / Prospects</div>${assetTable(list,true)}`;
+}
+function players(){
+  const filters=['All','Vancouver','Available / Other','NHL Roster','Non-Roster','Expiring'];
+  let list=state.assets.slice();
+  if(state.filter==='Vancouver') list=list.filter(a=>a.rosterStatus==='NHL Roster'||a.rosterStatus==='Non-Roster');
+  if(state.filter==='Available / Other') list=list.filter(a=>a.rosterStatus==='Available-Other');
+  if(state.filter==='NHL Roster') list=list.filter(isNHL);
+  if(state.filter==='Non-Roster') list=list.filter(isNon);
+  if(state.filter==='Expiring') list=list.filter(expiring);
+  if(state.search) list=list.filter(a=>String(a.name).toLowerCase().includes(state.search.toLowerCase())||String(a.teamAbbreviation).toLowerCase().includes(state.search.toLowerCase()));
+  list=list.slice(0,250);
+  $('view').innerHTML = `<div class="section-title">Players & Assets</div><div class="toolbar"><input class="input" placeholder="Search player or team…" value="${escapeHtml(state.search)}" oninput="state.search=this.value;render()" /></div><div class="toolbar">${filters.map(f=>`<button class="btn ${state.filter===f?'green':'light'}" onclick="state.filter='${f}';render()">${f}</button>`).join('')}</div>${assetTable(list,true)}`;
+}
+function expiringView(){
+  const list=state.assets.filter(expiring).sort((a,b)=>String(a.rosterStatus).localeCompare(String(b.rosterStatus))||String(a.name).localeCompare(String(b.name)));
+  $('view').innerHTML = `<div class="section-title">Expiring Contracts</div><div class="notice warn">Contract duration of 1 = expiring after current season.</div>${assetTable(list,true)}`;
+}
+function notesView(){
+  const teamNotes=state.notes.filter(n=>n.noteType==='Team').slice().reverse();
+  $('view').innerHTML = `<div class="section-title">Team Notes</div><div class="card"><div class="form-grid"><div class="field"><label>Changed By</label><select id="noteBy"><option value="">Choose…</option><option>Cam</option><option>Gabe</option></select></div><div></div></div><div class="field"><label>New Team Note</label><textarea id="teamNote"></textarea></div><button class="btn green" onclick="saveTeamNote()">Save Note</button></div><div class="section-title">Recent Notes</div>${teamNotes.map(n=>`<div class="card"><b>${escapeHtml(n.changedBy||'')}</b> <span class="muted">${escapeHtml(n.createdAt||'')}</span><p>${escapeHtml(n.noteText||'')}</p></div>`).join('')}`;
+}
+async function saveTeamNote(){ try{ await post({action:'saveTeamNote', changedBy:$('noteBy').value, noteText:$('teamNote').value}); } catch(e){ alert(e.message); } }
+function historyView(){
+  $('view').innerHTML = `<div class="section-title">History</div>${state.history.map(h=>`<div class="card"><b>${escapeHtml(h.actionType)}</b> <span class="muted">${escapeHtml(h.timestamp)}</span><div>${escapeHtml(h.details||'')}</div><div class="muted">Changed by: ${escapeHtml(h.changedBy||'')}</div></div>`).join('') || '<div class="notice warn">No history yet.</div>'}`;
+}
+function assetTable(list, clickable){
+  return `<table><thead><tr><th>Name</th><th>Pos</th><th>OVR</th><th>Team</th><th>Status</th><th>Dur.</th><th>Salary</th></tr></thead><tbody>${list.map(a=>`<tr ${clickable?`onclick="openAsset('${a.assetId}')"`:''}><td><b>${escapeHtml(displayName(a.name))}</b><br><span class="muted">${escapeHtml(a.potential||'')} ${escapeHtml(a.style||'')}</span></td><td>${escapeHtml(a.position||'')}</td><td><b>${escapeHtml(ovr(a))}</b></td><td>${escapeHtml(a.teamAbbreviation||'')}</td><td><span class="tag ${isNHL(a)?'green':isNon(a)?'':'warn'}">${escapeHtml(a.rosterStatus||'')}</span></td><td>${escapeHtml(dur(a.contractDuration))}</td><td class="money">${money(a.salary)}</td></tr>`).join('')}</tbody></table>`;
+}
+function openAsset(id){
+  const a=state.assets.find(x=>x.assetId===id); if(!a) return;
+  const playerNotes=state.notes.filter(n=>n.assetId===id).slice().reverse();
+  $('modal').className='modal';
+  $('modal').innerHTML = `<div class="modal-card"><div class="modal-head"><h2>${escapeHtml(displayName(a.name))}</h2><button class="btn gray" onclick="closeModal()">Close</button></div><p class="muted">${escapeHtml(a.teamAbbreviation)} · ${escapeHtml(a.position)} · ${escapeHtml(a.rosterStatus)}</p><div class="form-grid"><div class="field"><label>Salary</label><input id="assetSalary" class="input" value="${escapeHtml(a.salary||'')}" /></div><div class="field"><label>Contract Duration</label><input id="assetDuration" class="input" type="number" step="1" value="${escapeHtml(dur(a.contractDuration))}" /></div><div class="field"><label>Asset Type</label><select id="assetType"><option>NHL Player</option><option>AHL Player</option><option>Prospect</option><option>Draft Pick</option><option>Other</option></select></div><div class="field"><label>Move Status</label><select id="assetStatus"><option>NHL Roster</option><option>Non-Roster</option><option>Available-Other</option></select></div><div class="field"><label>Changed By</label><select id="assetBy"><option value="">Choose…</option><option>Cam</option><option>Gabe</option></select></div></div><div class="field"><label>Player Notes</label><textarea id="assetNotes">${escapeHtml(a.playerNotes||'')}</textarea></div><div class="toolbar"><button class="btn green" onclick="saveAsset('${id}')">Save Player</button><button class="btn" onclick="moveAsset('${id}')">Move Status Only</button></div><div class="section-title">Add Player Note</div><textarea id="newPlayerNote"></textarea><button class="btn green" onclick="savePlayerNote('${id}')">Save Player Note</button><div class="section-title">Existing Player Notes</div>${playerNotes.map(n=>`<div class="notice warn"><b>${escapeHtml(n.changedBy)}</b>: ${escapeHtml(n.noteText)}</div>`).join('')||'<p class="muted">No player notes yet.</p>'}</div>`;
+  $('assetType').value=a.assetType||'NHL Player'; $('assetStatus').value=a.rosterStatus||'Available-Other';
+}
+function closeModal(){ $('modal').className='hidden'; $('modal').innerHTML=''; }
+async function saveAsset(id){ try{ await post({action:'updateAsset', assetId:id, salary:$('assetSalary').value, contractDuration:$('assetDuration').value, assetType:$('assetType').value, playerNotes:$('assetNotes').value, changedBy:$('assetBy').value}); closeModal(); } catch(e){ alert(e.message); } }
+async function moveAsset(id){ try{ await post({action:'moveAsset', assetId:id, rosterStatus:$('assetStatus').value, changedBy:$('assetBy').value}); closeModal(); } catch(e){ alert(e.message); } }
+async function savePlayerNote(id){ try{ await post({action:'savePlayerNote', assetId:id, changedBy:$('assetBy').value, noteText:$('newPlayerNote').value}); openAsset(id); } catch(e){ alert(e.message); } }
+function tradeView(){
+  const outAssets=trade.outIds.map(id=>state.assets.find(a=>a.assetId===id)).filter(Boolean);
+  const inAssets=trade.incoming.map(x=>({item:x, asset:state.assets.find(a=>a.assetId===x.assetId)})).filter(x=>x.asset);
+  const current=Number(state.summary.capHit||0);
+  const outCap=outAssets.filter(isNHL).reduce((s,a)=>s+Number(a.salary||0),0);
+  const inCap=inAssets.filter(x=>x.item.rosterStatus==='NHL Roster').reduce((s,x)=>s+Math.max(0,Number(x.item.salary||x.asset.salary||0)-Number(x.item.retainedSalary||0)),0);
+  const newCap=current-outCap+inCap;
+  const cap=Number(state.summary.cap||0);
+  const over=newCap>cap;
+  $('view').innerHTML = `<div class="section-title">Trade Builder</div>${over?`<div class="notice red">You cannot complete this trade, as this will have you OVER the salary cap.</div>`:''}<div class="split"><div class="card"><h3>Players / Assets Out</h3><button class="btn" onclick="openTradeSearch('out')">Add Outgoing</button><div class="asset-list">${outAssets.map(a=>chip(a,`removeOut('${a.assetId}')`)).join('')}</div></div><div class="card"><h3>Players / Assets In</h3><button class="btn" onclick="openTradeSearch('in')">Add Incoming</button><div class="asset-list">${inAssets.map(x=>incomingChip(x)).join('')}</div></div></div><div class="section-title">Preview</div><div class="card"><div class="summary-line"><span>Current Cap Hit</span><b>${money(current)}</b></div><div class="summary-line"><span>Outgoing NHL Cap</span><b>-${money(outCap)}</b></div><div class="summary-line"><span>Incoming NHL Cap</span><b>+${money(inCap)}</b></div><div class="summary-line"><span>New Cap Hit</span><b class="${over?'tag red':'tag green'}">${money(newCap)}</b></div><div class="summary-line"><span>Available After</span><b>${money(cap-newCap)}</b></div><div class="field"><label>Changed By</label><select id="tradeBy"><option value="">Choose…</option><option ${trade.changedBy==='Cam'?'selected':''}>Cam</option><option ${trade.changedBy==='Gabe'?'selected':''}>Gabe</option></select></div><div class="field"><label>Trade Notes</label><textarea id="tradeNotes" oninput="trade.notes=this.value">${escapeHtml(trade.notes||'')}</textarea></div><button class="btn green" ${over?'disabled':''} onclick="confirmTrade()">Complete Trade</button></div>`;
+}
+function chip(a, removeCall){return `<div class="asset-chip"><div><strong>${escapeHtml(displayName(a.name))}</strong><span class="muted">${escapeHtml(a.position)} · ${escapeHtml(a.rosterStatus)} · ${money(a.salary)}</span></div><button class="btn red" onclick="event.stopPropagation();${removeCall}">Remove</button></div>`;}
+function incomingChip(x){const a=x.asset,item=x.item;return `<div class="asset-chip"><div><strong>${escapeHtml(displayName(a.name))}</strong><span class="muted">${escapeHtml(a.position)} · ${money(item.salary||a.salary)} less retained ${money(item.retainedSalary||0)} → ${escapeHtml(item.rosterStatus)}</span></div><button class="btn red" onclick="event.stopPropagation();removeIn('${a.assetId}')">Remove</button></div>`;}
+function removeOut(id){trade.outIds=trade.outIds.filter(x=>x!==id);render();} function removeIn(id){trade.incoming=trade.incoming.filter(x=>x.assetId!==id);render();}
+function openTradeSearch(mode){
+  $('modal').className='modal';
+  $('modal').innerHTML=`<div class="modal-card"><div class="modal-head"><h2>Add ${mode==='out'?'Outgoing':'Incoming'} Asset</h2><button class="btn gray" onclick="closeModal()">Close</button></div><input class="input" id="tradeSearch" placeholder="Search players/assets…" oninput="renderTradeResults('${mode}')"/><div id="tradeResults" class="search-results"></div></div>`; renderTradeResults(mode);
+}
+function renderTradeResults(mode){
+  const q=($('tradeSearch')?.value||'').toLowerCase(); let list=state.assets.filter(a=>String(a.name).toLowerCase().includes(q)||String(a.teamAbbreviation).toLowerCase().includes(q));
+  if(mode==='out') list=list.filter(a=>a.rosterStatus==='NHL Roster'||a.rosterStatus==='Non-Roster'); else list=list.filter(a=>a.rosterStatus==='Available-Other');
+  $('tradeResults').innerHTML=list.slice(0,80).map(a=>`<div class="search-row" onclick="selectTradeAsset('${mode}','${a.assetId}')"><b>${escapeHtml(displayName(a.name))}</b><br><span class="muted">${escapeHtml(a.teamAbbreviation)} · ${escapeHtml(a.position)} · ${money(a.salary)} · ${escapeHtml(a.rosterStatus)}</span></div>`).join('');
+}
+function selectTradeAsset(mode,id){
+  const a=state.assets.find(x=>x.assetId===id); if(!a)return;
+  if(mode==='out'){ if(!trade.outIds.includes(id)) trade.outIds.push(id); closeModal(); render(); return; }
+  $('modal').innerHTML=`<div class="modal-card"><div class="modal-head"><h2>${escapeHtml(displayName(a.name))}</h2><button class="btn gray" onclick="closeModal()">Close</button></div><div class="field"><label>Salary to Use</label><input class="input" id="inSalary" value="${escapeHtml(a.salary||0)}" /></div><div class="field"><label>Retained by Other Team</label><input class="input" id="inRetained" value="0" /></div><div class="field"><label>Destination</label><select id="inStatus"><option>NHL Roster</option><option selected>Non-Roster</option></select></div><button class="btn green" onclick="addIncoming('${id}')">Add Incoming</button></div>`;
+}
+function addIncoming(id){ trade.incoming=trade.incoming.filter(x=>x.assetId!==id); trade.incoming.push({assetId:id,salary:$('inSalary').value,retainedSalary:$('inRetained').value,rosterStatus:$('inStatus').value}); closeModal(); render(); }
+async function confirmTrade(){
+  trade.changedBy=$('tradeBy').value; trade.notes=$('tradeNotes').value;
+  if(!confirm('Complete this trade? This will update the roster and history.')) return;
+  try{ await post({action:'completeTrade', outIds:trade.outIds, incoming:trade.incoming, notes:trade.notes, changedBy:trade.changedBy}); trade={outIds:[],incoming:[],notes:'',changedBy:''}; }catch(e){ alert(e.message); }
+}
+load().catch(e=>{$('view').innerHTML=`<div class="notice red">${escapeHtml(e.message)}</div>`});
+</script>
+</body>
+</html>
